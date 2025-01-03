@@ -1,0 +1,23 @@
+name: "Application deployment"
+on: 
+    push:
+      branches: [ "main"] # "release/**"
+
+# ci of both
+jobs:
+    ci-backend:
+        uses: ./.github/workflows/CI_backend.yml
+    ci-frontend:
+        uses: ./.github/workflows/CI_frontend.yml
+    check-artifacts:
+        runs-on: ubuntu-latest # the "worker node" where it's going to be build
+        needs: [ci-backend, ci-frontend]
+        steps:
+        - name: Download a backend artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.ci-backend.outputs.artifact }}
+        - name: Download a frontend artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.ci-ci-frontend.outputs.artifact }}

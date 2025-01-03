@@ -12,6 +12,13 @@ on:
     branches: [ "main", "develop"]
     paths:
       - 'backend/**'
+  workflow_call:
+    inputs:
+      externall_call:
+        description: 'To distinguish workflow_call from regular push'
+        type: boolean
+        required: false
+        default: true
 
 env:
   java_version: 17
@@ -25,6 +32,8 @@ defaults:
 jobs:
     build: # first job
         runs-on: ubuntu-latest # the "worker node" where it's going to be build
+        outputs:
+          artifact: ${{ steps.archive_artifact.outputs.artifact }}
         steps:
             - name: Check out code
               uses: actions/checkout@v4.1.7 # action
@@ -40,3 +49,22 @@ jobs:
             
             - name: Build with Gradle
               run: ./gradlew build
+            
+            - if: ${{ inputs.externall_call }}
+              name: Set Release version env variable
+              uses: thecodemonkey/action-get-gradle-version@master     # <- USE THIS ACTION TO READ THE VERSION FROM BUILD.GRADLE
+              id: version                                              # <- give this step an id to access the output of the step
+            
+            - if: ${{ inputs.externall_call }}
+              run: echo "artifact=artifact-backend-${{ steps.version.outputs.version }}" >> "$GITHUB_OUTPUT"
+
+            - if: ${{ inputs.externall_call }}
+              name: Archive artifact
+              id: archive_artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: "artifact-backend-${{ steps.version.outputs.version }}"
+                path: |
+                  "/home/runner/work/gh-actions-workflow/gh-actions-workflow/backend/build/libs/workshop-${{ steps.version.outputs.version }}.jar"
+                retention-days: 1
+                if-no-files-found: error
