@@ -1,4 +1,4 @@
-# worflow for building the front end
+# worflow for building the back end
 
 name: "Java backend CI" # the name of the job when ran
 
