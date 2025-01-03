@@ -6,8 +6,12 @@ name: "React frotend CI" # the name of the job when ran
 on: 
   push:
     branches: [ "main", "develop"]
+    paths: # only trigger if changes in this paths
+      - 'frontend/**'
   pull_request:
     branches: [ "main", "develop"]
+    paths:
+      - 'frontend/**'
 
 
 # run in parallel by default
