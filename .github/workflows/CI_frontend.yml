@@ -20,6 +20,7 @@ defaults:
 
 # run in parallel by default
 # can be multiple jobs
+# cannot share machines between jobs so either steps or need to check out in each job
 jobs:
     build: # first job
         runs-on: ubuntu-latest # the "worker node" where it's going to be build
